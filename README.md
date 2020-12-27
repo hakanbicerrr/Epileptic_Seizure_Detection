@@ -1,5 +1,5 @@
 # Epileptic_Seizure_Detection
-Epileptic Seizure Detection on EEG Data based on CHB-MIT database.
+Epileptic Seizure Detection on EEG Data based on CHB-MIT database using Discrete Wavelet Transform with wavelet family 'coif3', 7 level decomposition.
 
 RESULTS:
 
