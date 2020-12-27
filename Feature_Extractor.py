@@ -446,18 +446,19 @@ def get_non_seizure_features(training_nonseizure_data_dir):
 
 if __name__ == "__main__":
 
-    """train_seizure_features = get_seizure_features(training_seizure_headers_dir,
+    train_seizure_features = get_seizure_features(training_seizure_headers_dir,
                                                   training_seizure_annotations_dir,
                                                   training_seizure_data_dir)
 
-    """
-    """test_seizure_features = get_seizure_features(test_seizure_headers_dir,
+    
+    test_seizure_features = get_seizure_features(test_seizure_headers_dir,
                                                  test_seizure_annotations_dir,
                                                  test_seizure_data_dir)
-"""
-    # train_non_seizure_features = get_non_seizure_features(training_nonseizure_data_dir)
+
+    train_non_seizure_features = get_non_seizure_features(training_nonseizure_data_dir)
     test_non_seizure_features = get_non_seizure_features(training_nonseizure_data_dir)
-    # np.save("train_seizure_features_36f_2sn", train_seizure_features)
-    # np.save("test_seizure_features_36f_2sn", test_seizure_features)
-    # np.save("train_non_seizure_features_36f_2sn", train_non_seizure_features)
+    
+    np.save("train_seizure_features_36f_2sn", train_seizure_features)
+    np.save("test_seizure_features_36f_2sn", test_seizure_features)
+    np.save("train_non_seizure_features_36f_2sn", train_non_seizure_features)
     np. save("test_non_seizure_36f_2sn", test_non_seizure_features)
