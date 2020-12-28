@@ -1,5 +1,5 @@
 # Epileptic_Seizure_Detection
-Epileptic Seizure Detection on EEG Data based on CHB-MIT database using Discrete Wavelet Transform with wavelet family 'coif3', 7 level decomposition. Training is done by SVM with linear kernel.
+Epileptic Seizure Detection on EEG Data based on CHB-MIT database using Discrete Wavelet Transform with wavelet family 'coif3', 7 level decomposition. Training is done by SVM and Random Forest.
 
 36 Features are extracted from each subband and 23 channels. After DWT decomposition, I calculated Max, Min, Mean, Energy, Standard deviation and Skewness features for 6 subbands. 6 x 6 = 36 features are extracted for just 1 channel. Since we have 23 channel, every feature vector has 23x36 dimension.
 
