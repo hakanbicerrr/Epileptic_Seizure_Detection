@@ -28,4 +28,16 @@ False Negative Rate: % 10.307234886025768 \
 False Discovery Rate: % 18.02536231884058 \
 False Omission Rate: % 10.01926782273603 \
 Accuracy: % 85.85434173669468 \
+****************************** \
+\
+Sensitivity: % 97.73584905660377 \
+Specificity: % 93.71534195933457 \
+Positive Predictive Val: % 93.84057971014492 \
+Negative Predictive Val: % 97.6878612716763 \
+False Positive Rate: % 6.284658040665435 \
+False Negative Rate: % 2.2641509433962264 \
+False Discovery Rate: % 6.159420289855073 \
+False Omission Rate: % 2.312138728323699 \
+Accuracy: % 95.70494864612512
+
 
