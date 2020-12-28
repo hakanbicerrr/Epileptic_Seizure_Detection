@@ -30,7 +30,7 @@ False Omission Rate: % 10.01926782273603 \
 Accuracy: % 85.85434173669468 \
 ****************************** \
 Random Forest (n_estimators=20, random_state=0)
-\
+ \
 Sensitivity: % 97.73584905660377 \
 Specificity: % 93.71534195933457 \
 Positive Predictive Val: % 93.84057971014492 \
