@@ -3,6 +3,8 @@ from sklearn.preprocessing import normalize
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.svm import SVC
 from sklearn import metrics
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
 
 
 def calculate_performance(result, label_test_seizure, label_test):
@@ -38,6 +40,20 @@ def calculate_performance(result, label_test_seizure, label_test):
     # print("Recall: ", metrics.recall_score(label_test, result))
 
 
+def classify_with_svm(data_training, label_training, data_test):
+
+    clf = SVC(kernel="linear", verbose=3)
+    clf.fit(data_training, np.array(label_training))
+    result = clf.predict(data_test)
+    return result
+
+def classify_with_random_forest(data_training, label_training, data_test):
+
+    regressor = RandomForestClassifier(n_estimators=20, random_state=0)
+    regressor.fit(data_training, label_training)
+    result = regressor.predict(data_test)
+    return result
+
 def main():
 
     data_training_seizure = np.load("train_seizure_features_36f_2sn.npy")
@@ -69,18 +85,24 @@ def main():
     scaling = MinMaxScaler(feature_range=(-1, 1)).fit(data_training)
     data_training = scaling.transform(data_training)
     data_test = scaling.transform(data_test)
+    print("**********************SVM*************************")
 
-    zero = 0
-    one = 0
-    clf = SVC(kernel="rbf", gamma=0.1)
-    clf.fit(data_training, np.array(label_training))
-    result = clf.predict(data_test)
+
+    # SVM Classification
+    result = classify_with_svm(data_training, label_training, data_test)
     print(result)
-    one = np.count_nonzero(result == 1)
-    zero = np.count_nonzero(result == 0)
+    calculate_performance(result, label_test_seizure, label_test)
+
+    #one = np.count_nonzero(result == 1)
+    #zero = np.count_nonzero(result == 0)
     #print("# of positive predicted classes: ", one,
     #      "\n# of negative predicted classes: ", zero,
     #      "\nTotal test data:", one + zero)
+
+    # Random Forest Classification
+    print("******************Random Forest****************")
+    result = classify_with_random_forest(data_training, label_training, data_test)
+    print(result)
     calculate_performance(result, label_test_seizure, label_test)
 
 
