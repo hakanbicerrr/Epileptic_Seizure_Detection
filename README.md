@@ -4,7 +4,7 @@ Epileptic Seizure Detection on EEG Data based on CHB-MIT database using Discrete
 36 Features are extracted from each subband and 23 channels. After DWT decomposition, I calculated Max, Min, Mean, Energy, Standard deviation and Skewness features for 6 subbands. 6 x 6 = 36 features are extracted for just 1 channel. Since we have 23 channel, every feature vector has 23x36 dimension.
 
 RESULTS: \
-******************************* \
+****************************** \
 Linear SVM \
 \
 Sensitivity: % 92.0042643923241 \
@@ -29,7 +29,7 @@ False Discovery Rate: % 18.02536231884058 \
 False Omission Rate: % 10.01926782273603 \
 Accuracy: % 85.85434173669468 \
 ****************************** \
-Random Forest (n_estimators=20, random_state=0)
+Random Forest (n_estimators=20, random_state=0) \
  \
 Sensitivity: % 97.73584905660377 \
 Specificity: % 93.71534195933457 \
