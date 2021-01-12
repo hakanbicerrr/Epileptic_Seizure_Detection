@@ -5,7 +5,7 @@ import wfdb
 import pywt
 from scipy.stats import skew
 
-
+# Define the directory paths
 training_seizure_headers_dir = "Training/Header-seizure/"
 training_seizure_annotations_dir = "Training/Annotations/"
 training_seizure_data_dir = "Training/With-seizure/"
@@ -24,31 +24,35 @@ def get_seizure_features(training_seizure_headers_dir, training_seizure_annotati
     file_counter = 0
     total = 0
     k = 0
-    ann = []
+    ann = []  # For seizure annotation
     b = 0
-    data_training_seizure = []
-    data_training_seizure_names = []
+    data_training_seizure = []  # Data that should be trained.
+    data_training_seizure_names = []  # Names of the training data
     for file in os.listdir(training_seizure_headers_dir):
-        channels = wfdb.rdheader(training_seizure_headers_dir + file[0:-4])
-        orj_sig_name = channels.sig_name.copy()
-        seizure = wfdb.rdann(training_seizure_annotations_dir + file[0:-9] + ".edf", extension="seizures")
-        ann.append(seizure.sample)
-        print(file[0:-9], file_counter)
+        channels = wfdb.rdheader(training_seizure_headers_dir + file[0:-4])  # Extract channels.
+        orj_sig_name = channels.sig_name.copy()  # Extract channel names.
+        seizure = wfdb.rdann(training_seizure_annotations_dir + file[0:-9] + ".edf", extension="seizures")  # Read seizure annotation.
+        ann.append(seizure.sample)  # Save seizure annotation into a list.
+        print(file[0:-9], file_counter)  # Count the record of file.
         for j in range(0, len(ann[file_counter]), 2):
             print("file", "#")
             print(file_counter, j, k)
             print("Annotations:", ann[file_counter][j], ann[file_counter][j + 1])
 
+            # Load data according to seizure annotations.
             data_seizure = scipy.io.loadmat(training_seizure_data_dir + file[0:-4] + ".mat",
                                             variable_names=["val"]).get("val")[:,
                            ann[file_counter][j] - 1: ann[file_counter][j + 1]]
             print("Size of a data:", np.size(data_seizure))
             print("Shape of a data:", data_seizure.shape)
+            # Check if the data length and annotations match.
             print("Dimensions match: ",
                   ((ann[file_counter][j + 1]) - (ann[file_counter][j] - 1)) == data_seizure.shape[1])
 
-            if np.size(data_seizure) != 0 and data_seizure.shape[
-                1] >= 5120:  # 5120 = The first 20 seconds of the seizure
+            if np.size(data_seizure) != 0 and \
+                    data_seizure.shape[1] >= 5120:  # 5120 = The first 20 seconds of the seizure(epoch,segment)
+                # We want seizures more than 20 seconds.
+                # Delete some channels that are not needed.
                 if channels.n_sig > 23:
                     print(file)
                     print("**************************************** OLD Dimension:", data_seizure.shape)
@@ -87,8 +91,11 @@ def get_seizure_features(training_seizure_headers_dir, training_seizure_annotati
                     print("**************************************** NEW Dimension:", data_seizure.shape)
                 channels.sig_name = orj_sig_name.copy()
                 # print(data[:, 0], data[:, -1])
-                if len(data_seizure) >= 23:
-                    for i in range(int(data_seizure.shape[1]/512)+1):
+
+                # Feature Extraction
+                if len(data_seizure) >= 23:  # Check if there are equal to or more than 23 channels.
+                    for i in range(int(data_seizure.shape[1]/512)+1):  # Segment data into 2 seconds epoch.
+                        # Calculate DWT of 2 sec. epochs using "coif3" and 7 level.
                         coeffs = pywt.wavedec(data_seizure[0:23, i * 512:(i + 1) * 512], "coif3", level=7)
                         cA7, cD7, cD6, cD5, cD4, cD3, cD2, cD1 = coeffs
 
@@ -133,7 +140,7 @@ def get_seizure_features(training_seizure_headers_dir, training_seizure_annotati
                         band4_skew = []
                         band5_skew = []
                         band6_skew = []
-
+                        # Calculate 6 features of DWT coefficients.
                         for i in range(len(cD1)):
                             band1_en.append(np.sum(cD7[i, :] ** 2))
                             band2_en.append(np.sum(cD6[i, :] ** 2))
@@ -218,7 +225,7 @@ def get_seizure_features(training_seizure_headers_dir, training_seizure_annotati
                         band4_skew = np.array(band4_skew).reshape(1, -1)
                         band5_skew = np.array(band5_skew).reshape(1, -1)
                         band6_skew = np.array(band6_skew).reshape(1, -1)
-
+                        # Create feature vector.
                         feature_vector = np.concatenate((band1_en, band1_max, band1_min, band1_mean, band1_std, band1_skew,
                                                          band2_en, band2_max, band2_min, band2_mean, band2_std, band2_skew,
                                                          band3_en, band3_max, band3_min, band3_mean, band3_std, band3_skew,
@@ -228,12 +235,16 @@ def get_seizure_features(training_seizure_headers_dir, training_seizure_annotati
                                                          ), axis=0)
                         # print(np.transpose(feature_vector), np.transpose(feature_vector).shape)
                         print(np.transpose(feature_vector).shape)
+                        # Obtain training dataset as a list of array.
                         data_training_seizure.append(np.transpose(feature_vector))
 
                     # data_training.append(data[0:23, 0:5120])
                     data_training_seizure_names.append(file[0: -9])
                     k += 1
 
+                # Discard data and do nothing if the data size is equal to zero.
+                # This happens when the annotations are more than 1 million, because we can not read file which has
+                # 921600 samples. If annotation is more than 921000, we basically can not obtain the data.
                 elif np.size(data_seizure) == 0:
                     empty += 1
                     print("[]")
@@ -253,15 +264,16 @@ def get_seizure_features(training_seizure_headers_dir, training_seizure_annotati
     return data_training_seizure
 
 
-def get_non_seizure_features(training_nonseizure_data_dir):
+def get_non_seizure_features(training_nonseizure_data_dir):   # Obtain data without seizure and features.
 
+    # Same procedures as the data with seizure.
     data_training_nonseizure = []
 
     for file in os.listdir(training_nonseizure_data_dir):
         channels = wfdb.rdheader("Headers/" + file[0:-4])
         orj_sig_name = channels.sig_name.copy()
         data_without_seizure = scipy.io.loadmat(training_nonseizure_data_dir + file, variable_names=["val"]).get("val")[
-                               :, 4096:5120]  #0:4096
+                               :, 0:4096]  # 0:4096 for training. 4096:5120 for test.
         print(file)
         if channels.n_sig > 23:
 
@@ -298,7 +310,7 @@ def get_non_seizure_features(training_nonseizure_data_dir):
 
         channels.sig_name = orj_sig_name.copy()
         if len(data_without_seizure) >= 23:
-            for i in range(2):  # 8
+            for i in range(8):  # 8 for training data. 2 for test.
                 coeffs = pywt.wavedec(data_without_seizure[0:23, i * 512:(i + 1) * 512], "coif3", level=7)
                 cA7, cD7, cD6, cD5, cD4, cD3, cD2, cD1 = coeffs
                 band1_en = []
@@ -450,15 +462,15 @@ if __name__ == "__main__":
                                                   training_seizure_annotations_dir,
                                                   training_seizure_data_dir)
 
-    
     test_seizure_features = get_seizure_features(test_seizure_headers_dir,
                                                  test_seizure_annotations_dir,
                                                  test_seizure_data_dir)
 
     train_non_seizure_features = get_non_seizure_features(training_nonseizure_data_dir)
     test_non_seizure_features = get_non_seizure_features(training_nonseizure_data_dir)
-    
-    np.save("train_seizure_features_36f_2sn", train_seizure_features)
-    np.save("test_seizure_features_36f_2sn", test_seizure_features)
-    np.save("train_non_seizure_features_36f_2sn", train_non_seizure_features)
-    np. save("test_non_seizure_36f_2sn", test_non_seizure_features)
+
+    # Save Extracted Features.
+    # np.save("train_seizure_features_36f_2sn", train_seizure_features)
+    # np.save("test_seizure_features_36f_2sn", test_seizure_features)
+    # np.save("train_non_seizure_features_36f_2sn", train_non_seizure_features)
+    # np. save("test_non_seizure_36f_2sn", test_non_seizure_features)
