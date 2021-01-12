@@ -1,10 +1,8 @@
 import numpy as np
-from sklearn.preprocessing import normalize
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.svm import SVC
 from sklearn import metrics
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.neighbors import KNeighborsClassifier
 
 
 def calculate_performance(result, label_test_seizure, label_test):
