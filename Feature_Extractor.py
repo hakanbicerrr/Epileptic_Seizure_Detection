@@ -89,8 +89,7 @@ def get_seizure_features(training_seizure_headers_dir, training_seizure_annotati
 
                     a += 1
                     print("**************************************** NEW Dimension:", data_seizure.shape)
-                channels.sig_name = orj_sig_name.copy()
-                # print(data[:, 0], data[:, -1])
+                channels.sig_name = orj_sig_name.copy()            
 
                 # Feature Extraction
                 if len(data_seizure) >= 23:  # Check if there are equal to or more than 23 channels.
